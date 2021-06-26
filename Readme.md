@@ -14,11 +14,20 @@ For now, the only supported TTS is [Google's](https://cloud.google.com/text-to-s
 
 ## Installing
 
-The first step for the package to work is to download it (using e.g. `git clone`). In the folder, then install the requirements
+The script requires a working installation of Python 3 and or the Google cloud sdk.
+To install the script, download it (using e.g. `git clone`) and in the downloaded folder, install the package with
 ```bash
-pip install -r Requirements.txt
+pip install .
 ```
-You can then 
+That's it!
+Note that before using the package, you need to have set up a [Google TTS account](https://cloud.google.com/text-to-speech/docs/quickstart-protocol).
+*Before* running the script, do not forget to export your Google application credentials.
+```bash
+export GOOGLE_APPLICATION_CREDENTIALS=/path/to/your/credentials.json
+```
 
-# TODO list
-
+To run the script, now simply do
+```bash
+arxiv-reader -d "two days ago"
+arxiv-reader -d "01 June 2021"
+```
