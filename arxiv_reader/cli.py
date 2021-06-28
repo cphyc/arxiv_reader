@@ -204,7 +204,10 @@ def pull(args: argparse.Namespace) -> int:
         # Get rid of resubmitted articles
 
         title = entry.title.replace("\n", " ")
-        normalized_title = re.subn(" +", "_", title)[0]
+        # We replace slashes and backslashes to prevent issues on Linux/Windows
+        normalized_title = (
+            re.subn(" +", "_", title)[0].replace("/", " ").replace("\\", " ")
+        )
         logger.debug("Processing %s", normalized_title)
         if len(entry.authors) > 1:
             author_str = entry.authors[0].name + " et al. "
