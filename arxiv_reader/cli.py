@@ -78,7 +78,7 @@ def tts(text: str, path: Path):
             "audioEncoding": "LINEAR16",
             "pitch": 0,
             "effectsProfileId": ["headphone-class-device"],
-            "speakingRate": 1.1,
+            "speakingRate": 1,
         },
         "input": {
             "ssml": f"<speak>{text}</speak>",
