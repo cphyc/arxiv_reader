@@ -3,6 +3,7 @@ import base64
 import io
 import json
 import logging
+import random
 import re
 import subprocess
 import sys
@@ -41,7 +42,37 @@ def get_auth_info():
     )
 
 
+def random_voices_generator():
+    choices = {
+        "en-AU": [f"en-AU-Wavenet-{_}" for _ in "ABCD"],
+        "en-IN": [f"en-IN-Wavenet-{_}" for _ in "ABCD"],
+        "en-GB": [f"en-GB-Wavenet-{_}" for _ in "ABCDF"],
+        "en-US": [f"en-US-Wavenet-{_}" for _ in "ABCDEFGHIJ"],
+    }
+    keys = list(choices.keys())
+    prevName = None
+    prevLang = None
+    while True:
+        languageCode = keys[random.randint(0, len(keys) - 1)]
+        while languageCode == prevLang:
+            languageCode = keys[random.randint(0, len(keys) - 1)]
+
+        voices = choices[languageCode]
+
+        name = voices[random.randint(0, len(voices) - 1)]
+        while name == prevName:
+            name = voices[random.randint(0, len(voices) - 1)]
+
+        yield {"languageCode": languageCode, "name": name}
+        prevName = name
+        prevLang = languageCode
+
+
+voices_it = random_voices_generator()
+
+
 def tts(text: str, path: Path):
+    voice = next(voices_it)
     data = {
         "audioConfig": {
             "audioEncoding": "LINEAR16",
@@ -52,10 +83,10 @@ def tts(text: str, path: Path):
         "input": {
             "ssml": f"<speak>{text}</speak>",
         },
-        "voice": {"languageCode": "en-GB", "name": "en-GB-Wavenet-F"},
+        "voice": voice,
     }
 
-    logger.debug("Submitting to Google TTS")
+    logger.debug("Submitting to Google TTS with voice %s", voice["name"])
     r = requests.post(
         "https://texttospeech.googleapis.com/v1/text:synthesize",
         data=json.dumps(data),
