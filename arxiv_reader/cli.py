@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 from functools import cache
 from pathlib import Path
 from textwrap import dedent
-from typing import Optional, Sequence, Tuple
+from typing import Dict, Optional, Sequence, Tuple
 
 import arxiv
 import dateparser
@@ -118,10 +118,19 @@ def get_start_end(base_date: Optional[str]) -> Tuple[datetime, datetime, datetim
         if date.tzname() is None:
             date = date.replace(tzinfo=local_tz)
 
-    offset = timedelta(max(1, (date.weekday() + 6) % 7 - 3))
-    end_date = date - offset
-    offset = timedelta(max(1, (end_date.weekday() + 6) % 7 - 3))
-    start_date = end_date - offset
+    offset: Dict[int, Tuple[Optional[int], Optional[int]]] = {
+        0: (-3, -2),  # Mon: Thu->Fri
+        1: (-3, -1),  # Tue: Fri->Sat
+        2: (-2, -1),  # Wed: Mon->Tue
+        3: (-2, -1),  # Thu: Tue->Wed
+        4: (-2, -1),  # Fri: Wed->Thu
+        5: (None, None),  # No paper on Sat
+        6: (None, None),  # No paper on Sun
+    }
+    off1, off2 = (timedelta(_) for _ in offset[date.weekday()])
+
+    start_date = date + off1
+    end_date = date + off2
 
     return date, start_date, end_date
 
@@ -138,23 +147,28 @@ def pull(args: argparse.Namespace) -> int:
     date, start_date, end_date = get_start_end(args.date)
     output_folder = get_create_output_folder(args.output, date)
 
-    start = start_date.strftime("%Y%m%d2000")
-    end = end_date.strftime("%Y%m%d1959")
+    # No papers on Sat/Sun
+    if date.weekday() in (5, 6):
+        return 0
+
+    start = start_date.strftime("%Y%m%d1400")
+    end = end_date.strftime("%Y%m%d1359")
 
     logger.info(
-        f"Querying ADS from {start_date:%d %m %Y 20:00 EDT} "
-        f"to {end_date:%d %m %Y 19:59 EDT}"
+        f"Querying ADS from {start_date:%d %m %Y 14:00 EDT} "
+        f"to {end_date:%d %m %Y 13:59 EDT}"
     )
+    q = ARXIV_QUERY % dict(categories=" OR ".join(categories), start=start, end=end)
     search = arxiv.Search(
-        query=ARXIV_QUERY
-        % dict(categories=" OR ".join(categories), start=start, end=end),
+        query=q,
         max_results=100,
         sort_by=arxiv.SortCriterion.SubmittedDate,
     )
 
-    entries = [entry for entry in search.get() if entry.updated > entry.published]
+    entries = [entry for entry in search.get() if entry.updated == entry.published]
 
     logger.info("Found %s abstracts", len(entries))
+
     for i, entry in enumerate(tqdm(entries)):
         # Get rid of resubmitted articles
 
