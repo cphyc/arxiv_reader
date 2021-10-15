@@ -219,7 +219,7 @@ def set_metadata(filename: Path, metadata: PaperMetadata) -> int:
     song = eyed3.load(filename)
     song.tag.title = metadata.title
     song.tag.artist = metadata.authors
-    song.tag.year = metadata.year
+    song.tag.original_release_date = metadata.year
     song.tag.comments.set(metadata.url, "arxiv_url")
     song.tag.comments.set(metadata.abstract, "abstract")
     song.tag.save()
@@ -233,7 +233,7 @@ def get_metadata(filename: Path) -> PaperMetadata:
     return PaperMetadata(
         title=song.tag.title,
         authors=song.tag.artist,
-        year=song.tag.year,
+        year=song.tag.original_release_date,
         url=(url_obj.text if url_obj else ""),
         abstract=(abstract_obj.text if abstract_obj else ""),
     )
