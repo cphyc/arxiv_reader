@@ -8,7 +8,7 @@ import re
 import subprocess
 import sys
 from datetime import datetime, timedelta
-from functools import cache
+from functools import lru_cache
 from pathlib import Path
 from textwrap import dedent
 from typing import Dict, Optional, Sequence, Tuple
@@ -31,7 +31,7 @@ sh = logging.StreamHandler(stream=stream)
 logger.addHandler(sh)
 
 
-@cache
+@lru_cache(None)
 def get_auth_info():
     return (
         subprocess.check_output(
