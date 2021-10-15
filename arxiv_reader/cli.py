@@ -110,15 +110,45 @@ def tts(text: str, path: Path):
 
 def clean_math(match) -> str:
     txt = match.group("content")
-    return (
+    txt = (
         txt.replace("\\sim", " approximately ")
         .replace("\\approx", " approximately ")
         .replace(">", " greater than")
         .replace("<", " lower than")
         .replace(r"\geq", " greater or equal to ")
         .replace(r"\leq", " lower or equal to ")
+        # Remove formatting
+        .replace("\\mathrm", "")
+        .replace("\\mathtt", "")
+        .replace("\\mathbf", "")
+        .replace("\\mathcal", "")
+        .replace("\\rm", "")
+        .replace("\\it", "")
+        .replace("\\cal", "")
+        # Remove \ and { }
         .replace("\\", " ")
+        .replace("{", "")
+        .replace("}", "")
     )
+
+    UNITS_SPELLED_BASE = {
+        "pc": "parsec",
+        "ly": "light year",
+    }
+    UNITS_SPELLED = {}
+    for unit, unit_spelled in UNITS_SPELLED_BASE.items():
+        for prefix, prefix_spelled in {
+            "k": "kilo",
+            "M": "mega",
+            "G": "giga",
+            "": "",
+        }.items():
+            UNITS_SPELLED[f"{prefix}{unit}"] = f"{prefix_spelled} {unit_spelled}"
+    UNITS_SPELLED["au"] = "astronomical unit"
+
+    for unit, unit_spelled in UNITS_SPELLED.items():
+        txt = txt.replace(unit, unit_spelled)
+    return txt
 
 
 def clean_str(text: str) -> str:
