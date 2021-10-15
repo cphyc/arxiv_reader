@@ -343,6 +343,8 @@ def create_rss_feed(args: argparse.Namespace) -> int:
                 f"{title} by {metadata.authors} on {metadata.year}\n"
                 "\n"
                 f"{metadata.abstract}"
+                "\n"
+                f"arXiv: {metadata.url}"
             )
             fe.enclosure(url, 0, "audio/mpeg")
 
