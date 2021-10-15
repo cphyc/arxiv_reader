@@ -11,10 +11,11 @@ from datetime import datetime, timedelta
 from functools import lru_cache
 from pathlib import Path
 from textwrap import dedent
-from typing import Dict, Optional, Sequence, Tuple
+from typing import Dict, NamedTuple, Optional, Sequence, Tuple
 
 import arxiv
 import dateparser
+import eyed3
 import pydub
 import requests
 from dateutil import tz
@@ -71,7 +72,7 @@ def random_voices_generator():
 voices_it = random_voices_generator()
 
 
-def tts(text: str, path: Path):
+def tts(text: str, path: Path) -> Path:
     voice = next(voices_it)
     data = {
         "audioConfig": {
@@ -134,10 +135,14 @@ def clean_math(match) -> str:
     UNITS_SPELLED_BASE = {
         "pc": "parsec",
         "ly": "light year",
+        "m": "meter",
+        "y": "year",
     }
     UNITS_SPELLED = {}
     for unit, unit_spelled in UNITS_SPELLED_BASE.items():
         for prefix, prefix_spelled in {
+            "m": "milli",
+            "c": "centi",
             "k": "kilo",
             "M": "mega",
             "G": "giga",
@@ -202,6 +207,36 @@ def get_create_output_folder(output: str, date: datetime) -> Path:
     return output_folder
 
 
+class PaperMetadata(NamedTuple):
+    title: str
+    authors: str
+    year: str
+    url: str
+    abstract: str
+
+
+def set_metadata(filename: Path, metadata: PaperMetadata) -> int:
+    song = eyed3.load(filename)
+    song.tag.title = metadata.title
+    song.tag.artist = metadata.authors
+    song.tag.year = metadata.year
+    song.tag.internet_radio_url = metadata.url
+    song.tag.lyrics = metadata.abstract
+    song.tag.save()
+    return 0
+
+
+def get_metadata(filename: Path) -> PaperMetadata:
+    song = eyed3.load(filename)
+    return PaperMetadata(
+        title=song.tag.title,
+        authors=song.tag.artist,
+        year=song.tag.year,
+        url=song.tag.internet_radio_url,
+        abstract=song.tag.lyrics,
+    )
+
+
 def pull(args: argparse.Namespace) -> int:
     categories = ["cat:astro-ph.GA", "cat:astro-ph.CO"]
 
@@ -226,9 +261,11 @@ def pull(args: argparse.Namespace) -> int:
         sort_by=arxiv.SortCriterion.SubmittedDate,
     )
 
-    entries = [entry for entry in search.get() if entry.updated == entry.published]
+    entries = [entry for entry in search.results() if entry.updated == entry.published]
 
     logger.info("Found %s abstracts", len(entries))
+
+    out_code = 0
 
     for i, entry in enumerate(tqdm(entries)):
         # Get rid of resubmitted articles
@@ -257,9 +294,20 @@ def pull(args: argparse.Namespace) -> int:
         """
         )
         path = output_folder / f"{i+1}.{normalized_title}.mp3"
-        tts(feed_as_txt, path)
+        path = tts(feed_as_txt, path)
 
-    return 0
+        out_code |= set_metadata(
+            path,
+            PaperMetadata(
+                title="title",
+                authors=author_str,
+                year=entry.published,
+                url=f"http://arxiv.org/abs/{entry.entry_id}",
+                abstract=entry.summary,
+            ),
+        )
+
+    return out_code
 
 
 def create_rss_feed(args: argparse.Namespace) -> int:
@@ -282,6 +330,8 @@ def create_rss_feed(args: argparse.Namespace) -> int:
 
         for file in sorted(out.glob("*.mp3")):
             title = " ".join(file.name.replace("_", " ").split(".")[1:-1])
+            metadata = get_metadata(file)
+            title = metadata.title or title
             url = f"http://pub.cphyc.me/Science/arxiv/{date_str}/{file.name}"
             logger.info("Found mp3 file %s", file)
 
@@ -289,6 +339,11 @@ def create_rss_feed(args: argparse.Namespace) -> int:
             fe.id(url)
             fe.pubDate(dt)
             fe.title(f"{date_str} | {title}")
+            fe.description(
+                f"{title} by {metadata.authors} on {metadata.year}\n"
+                "\n"
+                f"{metadata.abstract}"
+            )
             fe.enclosure(url, 0, "audio/mpeg")
 
     fg.rss_str(pretty=True)
