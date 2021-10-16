@@ -210,7 +210,7 @@ def get_create_output_folder(output: str, date: datetime) -> Path:
 class PaperMetadata(NamedTuple):
     title: str
     authors: str
-    year: str
+    year: datetime
     url: str
     abstract: str
 
@@ -219,7 +219,7 @@ def set_metadata(filename: Path, metadata: PaperMetadata) -> int:
     song = eyed3.load(filename)
     song.tag.title = metadata.title
     song.tag.artist = metadata.authors
-    song.tag.original_release_date = metadata.year
+    song.tag.original_release_date = metadata.year.strftime("%Y-%m-%d")
     song.tag.comments.set(metadata.url, "arxiv_url")
     song.tag.comments.set(metadata.abstract, "abstract")
     song.tag.save()
