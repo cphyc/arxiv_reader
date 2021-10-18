@@ -353,7 +353,11 @@ def create_rss_feed(args: argparse.Namespace) -> int:
             fe.id(url)
             fe.pubDate(dt)
             fe.title(title)
-            content = ["{title} by {metadata.authors} on {dt}"]
+            if metadata.authors:
+                content = [f"{title} by {metadata.authors} on {dt}"]
+            else:
+                content = [f"{title} on {dt}"]
+
             if metadata.abstract:
                 content.append(metadata.abstract.replace("\n", "\n"))
             if metadata.url:
