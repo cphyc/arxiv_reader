@@ -12,7 +12,7 @@ from functools import lru_cache
 from pathlib import Path
 from textwrap import dedent
 from typing import Dict, NamedTuple, Optional, Sequence, Tuple
-from urllib.parse import quote
+from urllib.parse import quote, unquote
 
 import arxiv
 import dateparser
@@ -342,11 +342,11 @@ def create_rss_feed(args: argparse.Namespace) -> int:
         logger.info("Creating feed for date %s", date_str)
 
         for file in sorted(out.glob("*.mp3")):
-            title = " ".join(file.name.replace("_", " ").split(".")[1:-1])
+            title = unquote(" ".join(file.name.replace("_", " ").split(".")[1:-1]))
             metadata = get_metadata(file)
             if dt < max_time:
                 continue
-            url = f"http://pub.cphyc.me/Science/arxiv/{date_str}/{file.name}"
+            url = f"https://pub.cphyc.me/Science/arxiv/{date_str}/{quote(file.name)}"
             logger.info("Found mp3 file %s", file)
 
             fe = fg.add_entry()
