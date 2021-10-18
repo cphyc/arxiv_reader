@@ -366,26 +366,30 @@ def create_rss_feed(args: argparse.Namespace) -> int:
             fe.enclosure(url, 0, "audio/mpeg")
 
     fg.rss_str(pretty=True)
-    fg.rss_file(str(output_folder / "podcast.xml"))
+    fg.rss_file(str(output_folder / args.output))
     return 0
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-o", "--output", help="Output folder", type=str, default="output"
-    )
     parser.add_argument("-v", "--verbose", action="store_true")
     parser.set_defaults(func=lambda args: parser.print_help())
 
     subparsers = parser.add_subparsers()
     parser_pull = subparsers.add_parser("pull")
     parser_pull.add_argument(
+        "-o", "--output", help="Output folder", type=str, default="output"
+    )
+    parser_pull.add_argument(
         "-d", "--date", help="Date to query. Defaults to today.", default=None, type=str
     )
     parser_pull.set_defaults(func=pull)
 
     parser_rss = subparsers.add_parser("rss")
+    parser_pull.add_argument(
+        "-o", "--output", help="Output RSS file", type=str, default="podcast.xml"
+    )
+
     parser_rss.add_argument(
         "--max-time",
         help="How far back in time should the entry be added (default: %(default)s).",
