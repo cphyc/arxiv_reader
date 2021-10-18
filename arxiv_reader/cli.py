@@ -333,6 +333,8 @@ def create_rss_feed(args: argparse.Namespace) -> int:
 
     eastern_US_tz = tz.gettz("US/Eastern")
 
+    max_time = datetime.now() - timedelta(args.max_time)
+
     for out in sorted(output_folder.glob("*")):
         if out.is_file():
             continue
@@ -343,6 +345,9 @@ def create_rss_feed(args: argparse.Namespace) -> int:
         for file in sorted(out.glob("*.mp3")):
             title = " ".join(file.name.replace("_", " ").split(".")[1:-1])
             metadata = get_metadata(file)
+            pubdate = metadata.pubdate
+            if pubdate and pubdate < max_time:
+                continue
             title = metadata.title or title
             url = f"http://pub.cphyc.me/Science/arxiv/{date_str}/{file.name}"
             logger.info("Found mp3 file %s", file)
@@ -381,6 +386,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser_pull.set_defaults(func=pull)
 
     parser_rss = subparsers.add_parser("rss")
+    parser_rss.add_argument(
+        "--max-time",
+        help="How far back in time should the entry be added (default: %(default)s).",
+        default=30,
+        type=int,
+    )
     parser_rss.set_defaults(func=create_rss_feed)
 
     args = parser.parse_args(argv)
