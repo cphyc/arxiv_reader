@@ -208,18 +208,21 @@ def get_create_output_folder(output: str, date: datetime) -> Path:
 
 
 class PaperMetadata(NamedTuple):
-    title: str
-    authors: str
-    year: datetime
-    url: str
-    abstract: str
+    title: Optional[str] = None
+    authors: Optional[str] = None
+    pubdate: Optional[datetime] = None
+    url: Optional[str] = None
+    abstract: Optional[str] = None
 
 
 def set_metadata(filename: Path, metadata: PaperMetadata) -> int:
     song = eyed3.load(filename)
     song.tag.title = metadata.title
     song.tag.artist = metadata.authors
-    song.tag.original_release_date = metadata.year.strftime("%Y-%m-%d")
+    pubdate = metadata.pubdate
+    if not pubdate:
+        pubdate = datetime.now()
+    song.tag.original_release_date = pubdate.strftime("%Y-%m-%d")
     song.tag.comments.set(metadata.url, "arxiv_url")
     song.tag.comments.set(metadata.abstract, "abstract")
     song.tag.save()
@@ -228,6 +231,8 @@ def set_metadata(filename: Path, metadata: PaperMetadata) -> int:
 
 def get_metadata(filename: Path) -> PaperMetadata:
     song = eyed3.load(filename)
+    if not song:
+        return PaperMetadata()
     comments = song.tag.comments
     if comments:
         abstract_obj = comments.get("abstract")
@@ -238,7 +243,7 @@ def get_metadata(filename: Path) -> PaperMetadata:
     return PaperMetadata(
         title=song.tag.title,
         authors=song.tag.artist,
-        year=song.tag.original_release_date,
+        pubdate=song.tag.original_release_date,
         url=(url_obj.text if url_obj else ""),
         abstract=(abstract_obj.text if abstract_obj else ""),
     )
@@ -308,7 +313,7 @@ def pull(args: argparse.Namespace) -> int:
             PaperMetadata(
                 title="title",
                 authors=author_str,
-                year=entry.published,
+                pubdate=entry.published,
                 url=f"http://arxiv.org/abs/{entry.entry_id}",
                 abstract=entry.summary,
             ),
@@ -347,7 +352,7 @@ def create_rss_feed(args: argparse.Namespace) -> int:
             fe.pubDate(dt)
             fe.title(f"{date_str} | {title}")
             fe.description(
-                f"{title} by {metadata.authors} on {metadata.year}\n"
+                f"{title} by {metadata.authors} on {metadata.pubdate}\n"
                 "\n"
                 f"{metadata.abstract}"
                 "\n"
