@@ -12,6 +12,7 @@ from functools import lru_cache
 from pathlib import Path
 from textwrap import dedent
 from typing import Dict, NamedTuple, Optional, Sequence, Tuple
+from urllib.parse import quote
 
 import arxiv
 import dateparser
@@ -284,9 +285,7 @@ def pull(args: argparse.Namespace) -> int:
 
         title = entry.title.replace("\n", " ")
         # We replace slashes and backslashes to prevent issues on Linux/Windows
-        normalized_title = (
-            re.subn(" +", "_", title)[0].replace("/", " ").replace("\\", " ")
-        )
+        normalized_title = quote(re.subn(r"_?[ /\\${}\(\)\[\]]+_?", "_", title)[0])
         logger.debug("Processing %s", normalized_title)
         if len(entry.authors) > 1:
             author_str = entry.authors[0].name + " et al. "
@@ -347,21 +346,19 @@ def create_rss_feed(args: argparse.Namespace) -> int:
             metadata = get_metadata(file)
             if dt < max_time:
                 continue
-            title = metadata.title or title
             url = f"http://pub.cphyc.me/Science/arxiv/{date_str}/{file.name}"
             logger.info("Found mp3 file %s", file)
 
             fe = fg.add_entry()
             fe.id(url)
             fe.pubDate(dt)
-            fe.title(f"{date_str} | {title}")
-            fe.description(
-                f"{title} by {metadata.authors} on {dt}\n"
-                "\n"
-                f"{metadata.abstract}"
-                "\n"
-                f"arXiv: {metadata.url}"
-            )
+            fe.title(title)
+            content = ["{title} by {metadata.authors} on {dt}"]
+            if metadata.abstract:
+                content.append(metadata.abstract.replace("\n", "\n"))
+            if metadata.url:
+                content.append(f"arXiv: {metadata.url}")
+            fe.description("\n".join(content))
             fe.enclosure(url, 0, "audio/mpeg")
 
     fg.rss_str(pretty=True)
