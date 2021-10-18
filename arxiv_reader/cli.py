@@ -386,7 +386,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser_pull.set_defaults(func=pull)
 
     parser_rss = subparsers.add_parser("rss")
-    parser_pull.add_argument(
+    parser_rss.add_argument(
         "-o", "--output", help="Output RSS file", type=str, default="podcast.xml"
     )
 
