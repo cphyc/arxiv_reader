@@ -310,7 +310,7 @@ def pull(args: argparse.Namespace) -> int:
         out_code |= set_metadata(
             path,
             PaperMetadata(
-                title="title",
+                title=title,
                 authors=author_str,
                 pubdate=entry.published,
                 url=f"http://arxiv.org/abs/{entry.entry_id}",
