@@ -30,6 +30,7 @@ logger = logging.getLogger(__name__)
 stream = sys.stderr
 sh = logging.StreamHandler(stream=stream)
 logger.addHandler(sh)
+local_tz = tz.tzlocal()
 
 
 @lru_cache(None)
@@ -166,7 +167,6 @@ def get_start_end(base_date: Optional[str]) -> Tuple[datetime, datetime, datetim
     # ArXiV papers published on day X have been submitted between 20:00 Eastern US on
     # day X-2 and 19:59 on day X-1
     eastern_US_tz = tz.gettz("US/Eastern")
-    local_tz = tz.tzlocal()
 
     date: Optional[datetime]
     if base_date is None:
@@ -333,7 +333,7 @@ def create_rss_feed(args: argparse.Namespace) -> int:
 
     eastern_US_tz = tz.gettz("US/Eastern")
 
-    max_time = datetime.now() - timedelta(args.max_time)
+    max_time = datetime.now(tz=local_tz) - timedelta(args.max_time)
 
     for out in sorted(output_folder.glob("*")):
         if out.is_file():
@@ -345,8 +345,7 @@ def create_rss_feed(args: argparse.Namespace) -> int:
         for file in sorted(out.glob("*.mp3")):
             title = " ".join(file.name.replace("_", " ").split(".")[1:-1])
             metadata = get_metadata(file)
-            pubdate = metadata.pubdate
-            if pubdate and pubdate < max_time:
+            if dt < max_time:
                 continue
             title = metadata.title or title
             url = f"http://pub.cphyc.me/Science/arxiv/{date_str}/{file.name}"
@@ -357,7 +356,7 @@ def create_rss_feed(args: argparse.Namespace) -> int:
             fe.pubDate(dt)
             fe.title(f"{date_str} | {title}")
             fe.description(
-                f"{title} by {metadata.authors} on {metadata.pubdate}\n"
+                f"{title} by {metadata.authors} on {dt}\n"
                 "\n"
                 f"{metadata.abstract}"
                 "\n"
