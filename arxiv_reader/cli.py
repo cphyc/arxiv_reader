@@ -305,7 +305,8 @@ def pull(args: argparse.Namespace) -> int:
         """
         )
         path = output_folder / f"{i+1}.{normalized_title}.mp3"
-        path = tts(feed_as_txt, path)
+        if not path.exists():
+            path = tts(feed_as_txt, path)
 
         out_code |= set_metadata(
             path,
