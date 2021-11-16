@@ -353,6 +353,11 @@ def create_rss_feed(args: argparse.Namespace) -> int:
 
     fg = FeedGenerator()
     fg.load_extension("podcast")
+    fg.podcast.itunes_category({"cat": "Science & Medicine", "sub": "Natural Science"})
+    fg.podcast.itunes_author(config.author)
+    fg.podcast.itunes_explicit("no")
+    fg.podcast.itunes_complete("no")
+
     fg.title("Daily Arxiv Papers")
     fg.description("Daily astrophysics papers on the arxiv.")
     fg.link(href=f"{config.base_url}/podcast.rss", rel="alternate")
@@ -360,7 +365,6 @@ def create_rss_feed(args: argparse.Namespace) -> int:
     year = datetime.now().year
     fg.copyright(f"Copyright (c) {year} {config.copyright}")
     fg.author({"name": config.author, "email": config.author_email})
-
     eastern_US_tz = tz.gettz("US/Eastern")
 
     max_time = datetime.now(tz=local_tz) - timedelta(args.max_time)
