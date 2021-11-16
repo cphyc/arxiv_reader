@@ -19,6 +19,7 @@ import dateparser
 import eyed3
 import pydub
 import requests
+import toml
 from dateutil import tz
 from feedgen.feed import FeedGenerator
 from tqdm.auto import tqdm
@@ -31,7 +32,32 @@ logger = logging.getLogger(__name__)
 stream = sys.stderr
 sh = logging.StreamHandler(stream=stream)
 logger.addHandler(sh)
+logger.setLevel(logging.INFO)
 local_tz = tz.tzlocal()
+
+
+class Config(NamedTuple):
+    author: str
+    author_email: str
+    copyright: str
+    base_url: str
+
+
+candidates = [
+    Path(".") / "config.toml",
+    Path("~").expanduser() / ".config" / "arxiv_reader" / "config.toml",
+]
+for candidate in candidates:
+    if candidate.exists():
+        config = Config(**toml.load(candidate)["arxiv_reader"])
+        break
+else:
+    config = Config(
+        author="Noone",
+        author_email="noone@example.com",
+        copyright="None",
+        base_url="example.com",
+    )
 
 
 @lru_cache(None)
@@ -329,7 +355,11 @@ def create_rss_feed(args: argparse.Namespace) -> int:
     fg.load_extension("podcast")
     fg.title("Daily Arxiv Papers")
     fg.description("Daily astrophysics papers on the arxiv.")
-    fg.link(href="http://pub.cphyc.me/Science/arxiv/podcast.rss", rel="alternate")
+    fg.link(href=f"{config.base_url}/podcast.rss", rel="alternate")
+    fg.language("en")
+    year = datetime.now().year
+    fg.copyright(f"Copyright (c) {year} {config.copyright}")
+    fg.author({"name": config.author, "email": config.author_email})
 
     eastern_US_tz = tz.gettz("US/Eastern")
 
@@ -341,19 +371,19 @@ def create_rss_feed(args: argparse.Namespace) -> int:
         date_str = out.name
         dt = datetime.strptime(date_str, DATE_FMT).astimezone(eastern_US_tz)
         logger.info("Creating feed for date %s", date_str)
-
         for file in sorted(out.glob("*.mp3")):
             title = unquote(" ".join(file.name.replace("_", " ").split(".")[1:-1]))
             metadata = get_metadata(file)
             if dt < max_time:
                 continue
-            url = f"https://pub.cphyc.me/Science/arxiv/{date_str}/{quote(file.name)}"
+            url = f"{config.base_url}/{date_str}/{quote(file.name)}"
             logger.info("Found mp3 file %s", file)
 
             fe = fg.add_entry()
             fe.id(url)
             fe.pubDate(dt)
             fe.title(title)
+            fe.guid(url, permalink=True)
             if metadata.authors:
                 content = [f"{title} by {metadata.authors} on {dt}"]
             else:
@@ -364,10 +394,12 @@ def create_rss_feed(args: argparse.Namespace) -> int:
             if metadata.url:
                 content.append(f"arXiv: {metadata.url}")
             fe.description("\n".join(content))
-            fe.enclosure(url, 0, "audio/mpeg")
+            fe.enclosure(url, length=str(file.stat().st_size), type="audio/mpeg")
 
+    podcast_file = output_folder / args.rss_file
+    logger.info("Writing podcast in %s", podcast_file)
     fg.rss_str(pretty=True)
-    fg.rss_file(str(output_folder / args.rss_file))
+    fg.rss_file(str(podcast_file))
     return 0
 
 
