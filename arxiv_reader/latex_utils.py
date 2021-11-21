@@ -118,11 +118,20 @@ def latex2speech(src: str) -> str:
     for fname in renderer.files.values():
         if fname == "test.xml":
             with open(fname) as fd:
-                txt = fd.read().replace("_", "")
+                txt = fd.read()
                 break
     else:
         raise FileNotFoundError("Could not find file 'test.xml'")
 
+    # Do some post-processing...
+    # ... remove underscores
+    txt = txt.replace("_", "")
+
+    # ... replace superscripts following letters
+    # (e.g. Kpc^2 -> Kpc squared, Kpc^1.5 -> Kpc 1.5)
+    txt = re.sub(r"([a-zA-Z])\^2", r"\1 squared", txt)
+    txt = re.sub(r"([a-zA-Z])\^3", r"\1 cubed", txt)
+    txt = re.sub(r"([a-zA-Z])\^([-\+]?[0-9])", r"\1\2", txt)
     return txt
 
 

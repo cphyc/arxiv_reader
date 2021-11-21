@@ -1,16 +1,18 @@
  10^1, 10^12, 10^-1, 10^0, 10^a
 
+k=8hMpc-1
+
 Following are all mathmetical notations from the arXiv in November 2021:
 
 10^6   LsunΩH2  approximately 10^-4 z  approximately - -13 ≤Mr ≤-10 -17
 ≤Mr ≤-13 -43^○ / 0.0044 0.005 < z < 0.48 0.02-0.09 Msun0.05-0.30 Msun0.1
 μm 0.1 μm 0.19<z<0.48 0.1 – 2.75 μG 0.5 Msun0.5 ≤z ≤3 0.5 0.6-0.8
-Msun0<z<0.09 1 ≤m/(10^-22  eV/c^2) ≤30 1 ×1 ×2 kpc 1 1+z≃7.5 1.5 1.6 10
+Msun0<z<0.09 1 ≤m/(10^-22  eV/c squared) ≤30 1 ×1 ×2 kpc 1 1+z≃7.5 1.5 1.6 10
 ≥RTF/(1  pc) ≥1 10  Myr 10  kpc 10-100 10.3 ≤logM*/Msun ≤11.2 100 100 kpc
 10^6 10^-24 eV≤m≤10^-20 eV 10^12.0Msun 10^12.0Msun 10^8.5<Mstar<10^10.5
 Msun10^9.0Msun 11% 1% 1 310 1^○2 ×10^-3 Msun2.0<re<5 20-30% 228 250 26%
-2×10^9 Msun2×5500^3 2×10^8<M*<2×10^9 Msun 300 pc 3098 30^○37.5-40 km s^-1
-kpc^-1 38% 3≤ z ≤ 5 3×Re 45% 5-10  nm 51.5×10^13 Msun6.9×10^8 Msun 664
+2×10^9 Msun2×5500^3 2×10^8<M*<2×10^9 Msun 300 pc 3098 30^○37.5-40 km s-1
+kpc-1 38% 3≤ z ≤ 5 3×Re 45% 5-10  nm 51.5×10^13 Msun6.9×10^8 Msun 664
 74-94 % 8.4 ×10^-12 80 92-98 % < <40 =1300 =154 =977 > D ≈2 D≈2 Dfil<3
 Mpc/h Dfil>3 Mpc/h G = 18 G GBP - GRP H0 = 70.3 ±1.6 H0 = 72.42 ±0.76
 H0 L  approximately 10^11.5 LB≃10^10.7LsunM  approximately 2×10^9
@@ -18,26 +20,26 @@ MsunM^* M* M• approximately 10^10 Msun MstarMstar>10^10 MsunMh
 approximately 10^11.75 MsunM200c  approximately 10^13.1 Msun M200c=3-4
 ×10^13MsunM200c=5.8 M200 M200=1.09-0.43^+0.34×10^14 Msun
 M200=1.78-0.55^+0.44×10^14 Msun M200=2.61-0.60^+0.51×10^14 Msun MUV
-≤-24 Msun M•, seed > 10^3.5 Msun M•, seed M•, seed NH ≥2×10^20 R^2
+≤-24 Msun M•, seed > 10^3.5 Msun M•, seed M•, seed NH ≥2×10^20 R squared
 RTF > λdeB RTF RCR=6.0-6.4 kpc S8 = 0.8035 ±0.0097 S8 T approximately
 10^7 U [NeV] [M/H]neu % fEdd Δβd ≤0.01 ΛΩΛ+Ωm=1 Ωstar=0.004 Ωneutral
 approximately 10^-3 ΣF ϒ*  in (0.5, 1.0) α≈-1.2 αα,β,γα=1.8-3.2 α=2.35 αR
 αox=-1.4 αvir bar2wp(rp) ββ<-2 β=-2.34 β>-1 βd δα≃0.5 δδR δR^env
 dotgas l≈75 pc lε< 0.1 ε    γ≥0.1 Msun≥10^-22 ≥85 λλJ λdeB ≤10μG
-≤logMstar/Mvir≈-2.5 log(LHβ) log10(ρSFR [Msun yr^-1 Mpc^-3])≤-1.1
-i<22.5 sech^2 z  approximately 0.8 μφ(m) ∝m^-α φ^* ±∝M*^-1.18 ∝m ρHI ρSFR
+≤logMstar/Mvir≈-2.5 log(LHβ) log10(ρSFR [Msun yr-1 Mpc-3])≤-1.1
+i<22.5 sech squared z  approximately 0.8 μφ(m) ∝m^-α φ^* ±∝M*^-1.18 ∝m ρHI ρSFR
 ρgas/barbar≥10^3 ρgas/barbar≤10^3 ρgas/barbar≥10^3 ρmet,neu CO(3-2) >
-10  Msun CO(1-0) CO(3-2) Msun km s^-1 σ approximately 1.5 - 2×
+10  Msun CO(1-0) CO(3-2) Msun km s-1 σ approximately 1.5 - 2×
 approximately 6%, 9%  approximately 100 approximately 2  approximately 20%
 approximately 3  approximately 5 approximately 5.5 ×10^9  approximately 65 -
 90  approximately  approximately 100 Msun approximately 10%  approximately
 2  approximately 300% approximately 5 kpc  approximately 6 μG  approximately
-λdeB ≃10^12Msun≃2.5-7 Msun≃8-50 MsunSpitzer ×10^9 ××10^5 ξ∝r^-1 ξξ(r, z)
+λdeB ≃10^12Msun≃2.5-7 Msun≃8-50 MsunSpitzer ×10^9 ××10^5 ξ∝r-1 ξξ(r, z)
 ^2 ^6 ^7 ^8 ^-1 ^-2 ^-3 2 3 sunsun starve starve a0 aF = 4 πG ΣF
-aF ≈1.2 ×10^-10 mtrs/sec^2 aF cs cinfall d=17.7^+0.6-0.4 dVirgo = 16.5
-Mpc f≤0.3 fNV/fLyα ≤0.27 fDM(<Re) k<4hMpc^-1 k=15-20hMpc^-1 k=2hMpc^-1
-k=8hMpc^-1 k=8hMpc^-1 k>20hMpc^-1 k>4hMpc^-1 ktransition m m=2 ×10^-30 m>1
-Msunm* ≥8 Msunmr ≤23 mtip,0 = 27.19^+0.07-0.05 n=1 r≤50 rg=GM/c^2
+aF ≈1.2 ×10^-10 mtrs/sec squared aF cs cinfall d=17.7^+0.6-0.4 dVirgo = 16.5
+Mpc f≤0.3 fNV/fLyα ≤0.27 fDM(<Re) k<4hMpc-1 k=15-20hMpc-1 k=2hMpc-1
+k=8hMpc-1 k=8hMpc-1 k>20hMpc-1 k>4hMpc-1 ktransition m m=2 ×10^-30 m>1
+Msunm* ≥8 Msunmr ≤23 mtip,0 = 27.19^+0.07-0.05 n=1 r≤50 rg=GM/c squared
 r3,1 u z < 1 z = z > 7 z > z ≈5 - 6 z ≤0.5 z  approximately 0 z
 approximately 0.5 - 3 z  approximately 0.7 z  approximately 1 z
 approximately z z7 z=0 z=0-2 z=0.0 z=0.5 z=1 z=1.0, 0.5 z=12 z=2 z=2.317 z=3
