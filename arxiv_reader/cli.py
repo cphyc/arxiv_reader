@@ -269,12 +269,12 @@ def pull(args: argparse.Namespace) -> int:
         abstract = latex2speech(entry.summary.replace("\n", " "))
         feed_as_txt = dedent(
             f"""
-        <p>{title}, <break time="200ms"/> by {author_str}</p>
+        <p>“{title}”, <break time="200ms"/> by {author_str}</p>
 
         <p>
         {abstract}.
         </p>
-        <p><emphasis level=\"strong\">This</emphasis> was {title},
+        <p><emphasis level=\"strong\">This</emphasis> was “{title}”,
         <break time="200ms"/> by {author_str}.</p>
         """
         )
