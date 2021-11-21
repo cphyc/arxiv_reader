@@ -24,7 +24,8 @@ from dateutil import tz
 from feedgen.feed import FeedGenerator
 from tqdm.auto import tqdm
 
-MATH_RE = re.compile(r"\$(?P<content>([^\$]|(?<=\\)\$)*)\$")
+from arxiv_reader.latex_utils import latex2speech
+
 DATE_FMT = "%d-%m-%Y"
 ARXIV_QUERY = "(%(categories)s) AND lastUpdatedDate:[%(start)s TO %(end)s]"
 
@@ -135,59 +136,6 @@ def tts(text: str, path: Path) -> Path:
     sound.export(path, format="mp3")
 
     return path
-
-
-def clean_math(match) -> str:
-    txt = match.group("content")
-    txt = (
-        txt.replace("\\sim", " approximately ")
-        .replace("\\approx", " approximately ")
-        .replace(">", " greater than")
-        .replace("<", " lower than")
-        .replace(r"\geq", " greater or equal to ")
-        .replace(r"\leq", " lower or equal to ")
-        # Remove formatting
-        .replace("\\mathrm", "")
-        .replace("\\mathtt", "")
-        .replace("\\mathbf", "")
-        .replace("\\mathcal", "")
-        .replace("\\rm", "")
-        .replace("\\it", "")
-        .replace("\\cal", "")
-        # Remove \ and { }
-        .replace("\\", " ")
-        .replace("{", "")
-        .replace("}", "")
-    )
-
-    UNITS_SPELLED_BASE = {
-        "pc": "parsec",
-        "ly": "light year",
-        "m": "meter",
-        "y": "year",
-    }
-    UNITS_SPELLED = {}
-    for unit, unit_spelled in UNITS_SPELLED_BASE.items():
-        for prefix, prefix_spelled in {
-            "m": "milli",
-            "c": "centi",
-            "k": "kilo",
-            "M": "mega",
-            "G": "giga",
-            "": "",
-        }.items():
-            UNITS_SPELLED[f"{prefix}{unit}"] = f"{prefix_spelled} {unit_spelled}"
-    UNITS_SPELLED["au"] = "astronomical unit"
-
-    for unit, unit_spelled in UNITS_SPELLED.items():
-        txt = txt.replace(unit, unit_spelled)
-    return txt
-
-
-def clean_str(text: str) -> str:
-    """Clean a text from any math strings."""
-    # Find all math expressions and replace them
-    return MATH_RE.subn(clean_math, text)[0]
 
 
 def get_start_end(base_date: Optional[str]) -> Tuple[datetime, datetime, datetime]:
@@ -318,7 +266,7 @@ def pull(args: argparse.Namespace) -> int:
         else:
             author_str = entry.authors[0].name + ". "
 
-        abstract = clean_str(entry.summary.replace("\n", " "))
+        abstract = latex2speech(entry.summary.replace("\n", " "))
         feed_as_txt = dedent(
             f"""
         <p>{title}, <break time="200ms"/> by {author_str}</p>
