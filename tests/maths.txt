@@ -28,21 +28,23 @@ dotgas l≈75 pc lε< 0.1 ε    γ≥0.1 Msun≥10^-22 ≥85 λλJ λdeB ≤10μ
 i<22.5 sech^2 z  approximately 0.8 μφ(m) ∝m^-α φ^* ±∝M*^-1.18 ∝m ρHI ρSFR
 ρgas/barbar≥10^3 ρgas/barbar≤10^3 ρgas/barbar≥10^3 ρmet,neu CO(3-2) >
 10  Msun CO(1-0) CO(3-2) Msun km s^-1 σ approximately 1.5 - 2×
-approximately 6%, 9%  approximately 100  approximately 2  approximately 20%
-approximately 3  approximately 5  approximately 5.5 ×10^9  approximately 65
-- 90  approximately  approximately 100 Msun approximately 10%
-approximately 2  approximately 300%  approximately 5 kpc  approximately 6 μG
-approximately λdeB ≃10^12Msun≃2.5-7 Msun≃8-50 MsunSpitzer ×10^9 ××10^5
-ξ∝r^-1 ξξ(r, z) ^2 ^6 ^7 ^8 ^-1 ^-2 ^-3 2 3 sunsun starve starve a0
-aF = 4 πG ΣF aF ≈1.2 ×10^-10 mtrs/sec^2 aF cs cinfall d=17.7^+0.6-0.4
-dVirgo = 16.5 Mpc f≤0.3 fNV/fLyα ≤0.27 fDM(<Re) k<4hMpc^-1
-k=15-20hMpc^-1 k=2hMpc^-1 k=8hMpc^-1 k=8hMpc^-1 k>20hMpc^-1 k>4hMpc^-1
-ktransition m m=2 ×10^-30 m>1 Msunm* ≥8 Msunmr ≤23 mtip,0 =
-27.19^+0.07-0.05 n=1 r≤50 rg=GM/c^2 r3,1 u z < 1 z = z > 7 z > z ≈5 - 6 z
-≤0.5 z  approximately 0 z  approximately 0.5 - 3 z  approximately 0.7 z
-approximately 1 z  approximately z z7 z=0 z=0-2 z=0.0 z=0.5 z=1 z=1.0, 0.5
-z=12 z=2 z=2.317 z=3 z=3.21 z=4 z=6 z=7 z=7.642 z=9 z=99 z>1 z>6 z>8 z≈1
-z≥5.5 z≥3 z approximately 2 z approximately 9 z approximately 9-10 z
-approximately 1.5 z approximately 2 z approximately 2-3 z approximately 7 z
-approximately 7.8 z approximately 2.5 zs < 2 zs≈0.6 D λ1 λ1.3 T≤10^5
-T≥10^5 T≤10^5  approximately 500rg |XGal| <5 |YGal| <3.5 |ZGal| <1
+approximately 6%, 9%  approximately 100 approximately 2  approximately 20%
+approximately 3  approximately 5 approximately 5.5 ×10^9  approximately 65 -
+90  approximately  approximately 100 Msun approximately 10%  approximately
+2  approximately 300% approximately 5 kpc  approximately 6 μG  approximately
+λdeB ≃10^12Msun≃2.5-7 Msun≃8-50 MsunSpitzer ×10^9 ××10^5 ξ∝r^-1 ξξ(r, z)
+^2 ^6 ^7 ^8 ^-1 ^-2 ^-3 2 3 sunsun starve starve a0 aF = 4 πG ΣF
+aF ≈1.2 ×10^-10 mtrs/sec^2 aF cs cinfall d=17.7^+0.6-0.4 dVirgo = 16.5
+Mpc f≤0.3 fNV/fLyα ≤0.27 fDM(<Re) k<4hMpc^-1 k=15-20hMpc^-1 k=2hMpc^-1
+k=8hMpc^-1 k=8hMpc^-1 k>20hMpc^-1 k>4hMpc^-1 ktransition m m=2 ×10^-30 m>1
+Msunm* ≥8 Msunmr ≤23 mtip,0 = 27.19^+0.07-0.05 n=1 r≤50 rg=GM/c^2
+r3,1 u z < 1 z = z > 7 z > z ≈5 - 6 z ≤0.5 z  approximately 0 z
+approximately 0.5 - 3 z  approximately 0.7 z  approximately 1 z
+approximately z z7 z=0 z=0-2 z=0.0 z=0.5 z=1 z=1.0, 0.5 z=12 z=2 z=2.317 z=3
+z=3.21 z=4 z=6 z=7 z=7.642 z=9 z=99 z>1 z>6 z>8 z≈1 z≥5.5 z≥3 z
+approximately 2 z approximately 9 z approximately 9-10 z approximately 1.5 z
+approximately 2 z approximately 2-3 z approximately 7 z approximately 7.8 z
+approximately 2.5 zs < 2 zs≈0.6 D λ1 λ1.3 T≤10^5 T≥10^5 T≤10^5
+approximately 500rg |XGal| <5 |YGal| <3.5 |ZGal| <1
+
+
