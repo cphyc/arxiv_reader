@@ -48,5 +48,3 @@ approximately 2 z approximately 9 z approximately 9-10 z approximately 1.5 z
 approximately 2 z approximately 2-3 z approximately 7 z approximately 7.8 z
 approximately 2.5 zs < 2 zs≈0.6 D λ1 λ1.3 T≤10^5 T≥10^5 T≤10^5
 approximately 500rg |XGal| <5 |YGal| <3.5 |ZGal| <1
-
-
