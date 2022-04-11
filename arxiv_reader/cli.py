@@ -179,16 +179,13 @@ def get_start_end(
         extra_offset = -1
 
     offset: Dict[int, Tuple[Optional[int], Optional[int]]] = {
-        1: (-1, 0),  # Tue after 20:00 Eastern - papers from Mon 14:00 to Tue 13:59
-        2: (
-            -1,
-            0,
-        ),  # Wed after 20:00 Eastern - papers from Tue 14:00 to Wed 13:59
-        3: (-1, 0),  # Thu after 20:00 Eastern - papers from Wed 14:00 to Thu 13:59
+        1: (-1, 0),  # Tue after 20:00 ET - papers from Mon 14:00 to Tue 13:59
+        2: (-1, 0),  # Wed after 20:00 ET - papers from Tue 14:00 to Wed 13:59
+        3: (-1, 0),  # Thu after 20:00 ET - papers from Wed 14:00 to Thu 13:59
         4: (None, None),  # Friday - no new announced papers
         5: (None, None),  # Saturday - no new announced papers
-        6: (-3, -2),  # Sun after 20:00 Eastern - papers from Thu 14:00 to Fri 13:59
-        0: (-3, 0),  # Mon after 20:00 Eastern - papers from Fri 14:00 to Mon 13:59
+        6: (-3, -2),  # Sun after 20:00 ET - papers from Thu 14:00 to Fri 13:59
+        0: (-3, 0),  # Mon after 20:00 ET - papers from Fri 14:00 to Mon 13:59
     }
 
     if all(_ is None for _ in offset[bucket]):
