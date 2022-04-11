@@ -146,10 +146,13 @@ def tts(text: str, path: Path) -> Path:
     return path
 
 
-def get_start_end(base_date: Optional[str]) -> Tuple[datetime, datetime, datetime]:
+def get_start_end(
+    base_date: Optional[str],
+) -> Tuple[datetime, Optional[datetime], Optional[datetime]]:
     # ArXiV papers published on day X have been submitted between 20:00 Eastern US on
     # day X-2 and 19:59 on day X-1
     eastern_US_tz = tz.gettz("US/Eastern")
+    UTC_tz = tz.gettz("UTC")
 
     date: Optional[datetime]
     if base_date is None:
@@ -165,23 +168,58 @@ def get_start_end(base_date: Optional[str]) -> Tuple[datetime, datetime, datetim
         else:
             date = date.astimezone(eastern_US_tz)
         if date.tzname() is None:
-            date = date.replace(tzinfo=local_tz)
+            date = date.replace(tzinfo=local_tz).astimezone(eastern_US_tz)
+
+    # According to https://arxiv.org/help/availability
+    if date.hour >= 20:
+        bucket = date.weekday()
+        extra_offset = 0
+    else:
+        bucket = (date.weekday() - 1) % 7
+        extra_offset = -1
 
     offset: Dict[int, Tuple[Optional[int], Optional[int]]] = {
-        0: (-3, -2),  # Mon: Thu->Fri
-        1: (-3, -1),  # Tue: Fri->Sat
-        2: (-2, -1),  # Wed: Mon->Tue
-        3: (-2, -1),  # Thu: Tue->Wed
-        4: (-2, -1),  # Fri: Wed->Thu
-        5: (None, None),  # No paper on Sat
-        6: (None, None),  # No paper on Sun
+        1: (-1, 0),  # Tuesday after 20:00 Eastern - papers from Mon 14:00 to Tue 13:59
+        2: (
+            -1,
+            0,
+        ),  # Wednesday after 20:00 Eastern - papers from Tue 14:00 to Wed 13:59
+        3: (-1, 0),  # Thursday after 20:00 Eastern - papers from Wed 14:00 to Thu 13:59
+        4: (None, None),  # Friday - no new announced papers
+        5: (None, None),  # Saturday - no new announced papers
+        6: (-3, -2),  # Sunday after 20:00 Eastern - papers from Thu 14:00 to Fri 13:59
+        0: (-3, 0),  # Monday after 20:00 Eastern - papers from Fri 14:00 to Mon 13:59
     }
-    off1, off2 = (timedelta(_) for _ in offset[date.weekday()])
+
+    if all(_ is None for _ in offset[bucket]):
+        return date, None, None
+    off1, off2 = (timedelta(_ + extra_offset) for _ in offset[bucket])
 
     start_date = date + off1
     end_date = date + off2
 
-    return date, start_date, end_date
+    start_date = datetime(
+        year=start_date.year,
+        month=start_date.month,
+        day=start_date.day,
+        hour=14,
+        minute=0,
+        tzinfo=eastern_US_tz,
+    )
+    end_date = datetime(
+        year=end_date.year,
+        month=end_date.month,
+        day=end_date.day,
+        hour=13,
+        minute=59,
+        tzinfo=eastern_US_tz,
+    )
+
+    return (
+        date.astimezone(UTC_tz),
+        start_date.astimezone(UTC_tz),
+        end_date.astimezone(UTC_tz),
+    )
 
 
 def get_create_output_folder(output: str, date: datetime) -> Path:
@@ -234,18 +272,17 @@ def get_metadata(filename: Path) -> PaperMetadata:
 
 def pull(*, base_date: Optional[str], output: str, **kwargs) -> int:
     date, start_date, end_date = get_start_end(base_date)
-    output_folder = get_create_output_folder(output, date)
-
     # No papers on Sat/Sun
-    if date.weekday() in (5, 6):
+    if start_date is None or end_date is None:
         return 0
+    output_folder = get_create_output_folder(output, date)
 
     start = start_date.strftime("%Y%m%d1400")
     end = end_date.strftime("%Y%m%d1359")
 
     logger.info(
-        f"Querying ADS from {start_date:%d %m %Y 14:00 EDT} "
-        f"to {end_date:%d %m %Y 13:59 EDT}"
+        f"Querying ADS from {start_date:%d %m %Y 14:00 Eastern time} "
+        f"to {end_date:%d %m %Y 13:59 Eastern time}"
     )
     q = ARXIV_QUERY % dict(
         categories=" OR ".join(ASTRO_CATEGORIES), start=start, end=end
@@ -256,7 +293,7 @@ def pull(*, base_date: Optional[str], output: str, **kwargs) -> int:
         sort_by=arxiv.SortCriterion.SubmittedDate,
     )
 
-    entries = [entry for entry in search.results() if entry.updated == entry.published]
+    entries = [entry for entry in search.results()]
 
     logger.info("Found %s abstracts", len(entries))
 
