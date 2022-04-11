@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from functools import lru_cache
 from pathlib import Path
 from textwrap import dedent
-from typing import Dict, NamedTuple, Optional, Sequence, Tuple
+from typing import Dict, List, NamedTuple, Optional, Sequence, Tuple
 from urllib.parse import quote, unquote
 
 import arxiv
@@ -28,6 +28,7 @@ from arxiv_reader.latex_utils import latex2speech
 
 DATE_FMT = "%d-%m-%Y"
 ARXIV_QUERY = "(%(categories)s) AND lastUpdatedDate:[%(start)s TO %(end)s]"
+ASTRO_CATEGORIES = ("cat:astro-ph.GA", "cat:astro-ph.CO", "cat:astro-ph.EP", "cat:astro-ph.HE", "cat:astro-ph.IM", "cat:astro-ph.SR")
 
 logger = logging.getLogger(__name__)
 stream = sys.stderr
@@ -224,11 +225,9 @@ def get_metadata(filename: Path) -> PaperMetadata:
     )
 
 
-def pull(args: argparse.Namespace) -> int:
-    categories = ["cat:astro-ph.GA", "cat:astro-ph.CO"]
-
-    date, start_date, end_date = get_start_end(args.date)
-    output_folder = get_create_output_folder(args.output, date)
+def pull(*, base_date: Optional[str], output: str) -> int:
+    date, start_date, end_date = get_start_end(base_date)
+    output_folder = get_create_output_folder(output, date)
 
     # No papers on Sat/Sun
     if date.weekday() in (5, 6):
@@ -241,7 +240,7 @@ def pull(args: argparse.Namespace) -> int:
         f"Querying ADS from {start_date:%d %m %Y 14:00 EDT} "
         f"to {end_date:%d %m %Y 13:59 EDT}"
     )
-    q = ARXIV_QUERY % dict(categories=" OR ".join(categories), start=start, end=end)
+    q = ARXIV_QUERY % dict(categories=" OR ".join(ASTRO_CATEGORIES), start=start, end=end)
     search = arxiv.Search(
         query=q,
         max_results=100,
@@ -296,8 +295,8 @@ def pull(args: argparse.Namespace) -> int:
     return out_code
 
 
-def create_rss_feed(args: argparse.Namespace) -> int:
-    output_folder = Path(args.output)
+def create_rss_feed(*, output: str, max_time: int, rss_file: str, categories: List[str]) -> int:
+    output_folder = Path(output)
 
     fg = FeedGenerator()
     fg.load_extension("podcast")
@@ -315,7 +314,7 @@ def create_rss_feed(args: argparse.Namespace) -> int:
     fg.author({"name": config.author, "email": config.author_email})
     eastern_US_tz = tz.gettz("US/Eastern")
 
-    max_time = datetime.now(tz=local_tz) - timedelta(args.max_time)
+    max_time_dt = datetime.now(tz=local_tz) - timedelta(max_time)
 
     for out in sorted(output_folder.glob("*")):
         if out.is_file():
@@ -326,7 +325,7 @@ def create_rss_feed(args: argparse.Namespace) -> int:
         for file in sorted(out.glob("*.mp3")):
             title = unquote(" ".join(file.name.replace("_", " ").split(".")[1:-1]))
             metadata = get_metadata(file)
-            if dt < max_time:
+            if dt < max_time_dt:
                 continue
             url = f"{config.base_url}/{date_str}/{quote(file.name)}"
             logger.info("Found mp3 file %s", file)
@@ -348,7 +347,7 @@ def create_rss_feed(args: argparse.Namespace) -> int:
             fe.description("\n".join(content))
             fe.enclosure(url, length=str(file.stat().st_size), type="audio/mpeg")
 
-    podcast_file = output_folder / args.rss_file
+    podcast_file = output_folder / rss_file
     logger.info("Writing podcast in %s", podcast_file)
     fg.rss_str(pretty=True)
     fg.rss_file(str(podcast_file))
@@ -361,7 +360,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument(
         "-o", "--output", help="Output folder", type=str, default="output"
     )
-    parser.set_defaults(func=lambda args: parser.print_help())
+    parser.set_defaults(func=lambda _: parser.print_help())
 
     subparsers = parser.add_subparsers()
     parser_pull = subparsers.add_parser("pull")
@@ -373,6 +372,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser_rss = subparsers.add_parser("rss")
     parser_rss.add_argument(
         "-f", "--rss-file", help="Output RSS file", type=str, default="podcast.xml"
+    )
+    parser_rss.add_argument(
+        "--categories", default=ASTRO_CATEGORIES, nargs="+", type=str,
+        help=(
+            "Categories to include in the RSS feed. Defaults to all astronomy "
+            "categories. See https://arxiv.org/ for the possible ones."
+        )
     )
 
     parser_rss.add_argument(
@@ -387,7 +393,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     if args.verbose:
         logger.setLevel(10)
 
-    return args.func(args)
+    return args.func(**vars(args))
 
 
 if __name__ == "__main__":
