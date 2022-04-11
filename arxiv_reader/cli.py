@@ -232,7 +232,7 @@ def get_metadata(filename: Path) -> PaperMetadata:
     )
 
 
-def pull(*, base_date: Optional[str], output: str) -> int:
+def pull(*, base_date: Optional[str], output: str, **kwargs) -> int:
     date, start_date, end_date = get_start_end(base_date)
     output_folder = get_create_output_folder(output, date)
 
@@ -305,7 +305,7 @@ def pull(*, base_date: Optional[str], output: str) -> int:
 
 
 def create_rss_feed(
-    *, output: str, max_time: int, rss_file: str, categories: List[str]
+    *, output: str, max_time: int, rss_file: str, categories: List[str], **kwargs
 ) -> int:
     output_folder = Path(output)
 
@@ -376,7 +376,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     subparsers = parser.add_subparsers()
     parser_pull = subparsers.add_parser("pull")
     parser_pull.add_argument(
-        "-d", "--date", help="Date to query. Defaults to today.", default=None, type=str
+        "-d",
+        "--date",
+        help="Date to query. Defaults to today.",
+        default=None,
+        type=str,
+        dest="base_date",
     )
     parser_pull.set_defaults(func=pull)
 
