@@ -28,7 +28,14 @@ from arxiv_reader.latex_utils import latex2speech
 
 DATE_FMT = "%d-%m-%Y"
 ARXIV_QUERY = "(%(categories)s) AND lastUpdatedDate:[%(start)s TO %(end)s]"
-ASTRO_CATEGORIES = ("cat:astro-ph.GA", "cat:astro-ph.CO", "cat:astro-ph.EP", "cat:astro-ph.HE", "cat:astro-ph.IM", "cat:astro-ph.SR")
+ASTRO_CATEGORIES = (
+    "cat:astro-ph.GA",
+    "cat:astro-ph.CO",
+    "cat:astro-ph.EP",
+    "cat:astro-ph.HE",
+    "cat:astro-ph.IM",
+    "cat:astro-ph.SR",
+)
 
 logger = logging.getLogger(__name__)
 stream = sys.stderr
@@ -240,7 +247,9 @@ def pull(*, base_date: Optional[str], output: str) -> int:
         f"Querying ADS from {start_date:%d %m %Y 14:00 EDT} "
         f"to {end_date:%d %m %Y 13:59 EDT}"
     )
-    q = ARXIV_QUERY % dict(categories=" OR ".join(ASTRO_CATEGORIES), start=start, end=end)
+    q = ARXIV_QUERY % dict(
+        categories=" OR ".join(ASTRO_CATEGORIES), start=start, end=end
+    )
     search = arxiv.Search(
         query=q,
         max_results=100,
@@ -295,7 +304,9 @@ def pull(*, base_date: Optional[str], output: str) -> int:
     return out_code
 
 
-def create_rss_feed(*, output: str, max_time: int, rss_file: str, categories: List[str]) -> int:
+def create_rss_feed(
+    *, output: str, max_time: int, rss_file: str, categories: List[str]
+) -> int:
     output_folder = Path(output)
 
     fg = FeedGenerator()
@@ -374,11 +385,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "-f", "--rss-file", help="Output RSS file", type=str, default="podcast.xml"
     )
     parser_rss.add_argument(
-        "--categories", default=ASTRO_CATEGORIES, nargs="+", type=str,
+        "--categories",
+        default=ASTRO_CATEGORIES,
+        nargs="+",
+        type=str,
         help=(
             "Categories to include in the RSS feed. Defaults to all astronomy "
             "categories. See https://arxiv.org/ for the possible ones."
-        )
+        ),
     )
 
     parser_rss.add_argument(
