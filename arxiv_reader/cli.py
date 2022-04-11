@@ -234,6 +234,7 @@ class PaperMetadata(NamedTuple):
     pubdate: Optional[datetime] = None
     url: Optional[str] = None
     abstract: Optional[str] = None
+    category: Optional[str] = None
 
 
 def set_metadata(filename: Path, metadata: PaperMetadata) -> int:
@@ -246,6 +247,7 @@ def set_metadata(filename: Path, metadata: PaperMetadata) -> int:
     song.tag.original_release_date = pubdate.strftime("%Y-%m-%d")
     song.tag.comments.set(metadata.url, "arxiv_url")
     song.tag.comments.set(metadata.abstract, "abstract")
+    song.tag.comments.set(metadata.category, "category")
     song.tag.save()
     return 0
 
@@ -258,15 +260,18 @@ def get_metadata(filename: Path) -> PaperMetadata:
     if comments:
         abstract_obj = comments.get("abstract")
         url_obj = comments.get("arxiv_url")
+        category_obj = comments.get("category")
     else:
         abstract_obj = None
         url_obj = None
+        category_obj = None
     return PaperMetadata(
         title=song.tag.title,
         authors=song.tag.artist,
         pubdate=song.tag.original_release_date,
         url=(url_obj.text if url_obj else ""),
         abstract=(abstract_obj.text if abstract_obj else ""),
+        category=(category_obj.text if category_obj else ""),
     )
 
 
@@ -335,6 +340,7 @@ def pull(*, base_date: Optional[str], output: str, **kwargs) -> int:
                 pubdate=entry.published,
                 url=f"http://arxiv.org/abs/{entry.entry_id}",
                 abstract=entry.summary,
+                category=entry.categories[0],
             ),
         )
 
@@ -374,6 +380,8 @@ def create_rss_feed(
             title = unquote(" ".join(file.name.replace("_", " ").split(".")[1:-1]))
             metadata = get_metadata(file)
             if dt < max_time_dt:
+                continue
+            elif metadata.category and metadata.category not in categories:
                 continue
             url = f"{config.base_url}/{date_str}/{quote(file.name)}"
             logger.info("Found mp3 file %s", file)
@@ -429,6 +437,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser_rss.add_argument(
         "--categories",
         default=ASTRO_CATEGORIES,
+        choices=ASTRO_CATEGORIES,
         nargs="+",
         type=str,
         help=(
