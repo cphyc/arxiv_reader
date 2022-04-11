@@ -5,28 +5,28 @@ minimum_pre_commit_version: "1.15.0"
 repos:
 
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.4.0
+    rev: v4.2.0
     hooks:
     - id: trailing-whitespace
     - id: end-of-file-fixer
     - id: no-commit-to-branch
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v2.12.0
+    rev: v2.32.0
     hooks:
     - id: pyupgrade
       args: [--py36-plus]
 -   repo: https://github.com/psf/black
-    rev: 20.8b1
+    rev: 22.3.0
     hooks:
     - id: black
       language_version: python3
 -   repo: https://github.com/PyCQA/isort
-    rev: '5.8.0'
+    rev: '5.10.1'
     hooks:
     - id: isort
       additional_dependencies: [toml]
 -   repo: https://github.com/PyCQA/flake8
-    rev: '3.9.1'
+    rev: '4.0.1'
     hooks:
     - id: flake8
       additional_dependencies: [
@@ -34,6 +34,7 @@ repos:
         flake8-logging-format
       ]
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.812
+    rev: v0.942
     hooks:
-    -   id: mypy
+    - id: mypy
+      additional_dependencies: [types-dateparser, types-toml, types-python-dateutil, types-requests]
