@@ -360,7 +360,7 @@ def create_rss_feed(
 
     fg.title("Daily Arxiv Papers")
     fg.description("Daily astrophysics papers on the arxiv.")
-    fg.link(href=f"{config.base_url}/podcast.rss", rel="alternate")
+    fg.link(href=f"{config.base_url}/{rss_file}", rel="alternate")
     fg.language("en")
     year = datetime.now().year
     fg.copyright(f"Copyright (c) {year} {config.copyright}")
