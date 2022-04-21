@@ -232,6 +232,7 @@ class PaperMetadata(NamedTuple):
     url: Optional[str] = None
     abstract: Optional[str] = None
     category: Optional[str] = None
+    duration: Optional[int] = None
 
 
 def set_metadata(filename: Path, metadata: PaperMetadata) -> int:
@@ -269,6 +270,7 @@ def get_metadata(filename: Path) -> PaperMetadata:
         url=(url_obj.text if url_obj else ""),
         abstract=(abstract_obj.text if abstract_obj else ""),
         category=(category_obj.text if category_obj else ""),
+        duration=round(song.info.time_secs),
     )
 
 
@@ -340,6 +342,7 @@ def pull(*, base_date: Optional[str], output: str, **kwargs) -> int:
                 url=f"http://arxiv.org/abs/{entry.entry_id}",
                 abstract=entry.summary,
                 category=entry.categories[0],
+                duration=None,
             ),
         )
 
@@ -353,18 +356,22 @@ def create_rss_feed(
 
     fg = FeedGenerator()
     fg.load_extension("podcast")
-    fg.podcast.itunes_category({"cat": "Science & Medicine", "sub": "Natural Science"})
+    fg.podcast.itunes_category({"cat": "Science", "sub": "Natural Sciences"})
     fg.podcast.itunes_author(config.author)
+    fg.podcast.itunes_owner(name=config.author, email=config.author_email)
+    fg.podcast.itunes_image(f"{config.base_url}/cover.png")
     fg.podcast.itunes_explicit("no")
     fg.podcast.itunes_complete("no")
 
     fg.title("Daily Arxiv Papers")
     fg.description("Daily astrophysics papers on the arxiv.")
-    fg.link(href=f"{config.base_url}/{rss_file}", rel="alternate")
+    fg.link(href=f"{config.base_url}/{rss_file}", rel="self")
     fg.language("en")
     year = datetime.now().year
     fg.copyright(f"Copyright (c) {year} {config.copyright}")
-    fg.author({"name": config.author, "email": config.author_email})
+    fg.author(name=config.author, email=config.author_email)
+    fg.managingEditor(f"{config.author_email} ({config.author})")
+    fg.image(f"{config.base_url}/cover.png")
     eastern_US_tz = tz.gettz("US/Eastern")
 
     max_time_dt = datetime.now(tz=local_tz) - timedelta(max_time)
@@ -389,25 +396,30 @@ def create_rss_feed(
 
             fe = fg.add_entry()
             fe.id(url)
+            fe.podcast.itunes_duration(metadata.duration)
+            fe.podcast.itunes_author(config.author)
             fe.pubDate(dt)
             fe.title(title)
             fe.guid(url, permalink=True)
             if metadata.authors:
-                content = [f"{title} by {metadata.authors} on {dt}"]
+                content = [f"{title} by {metadata.authors} on {dt:%A %d %B}"]
             else:
-                content = [f"{title} on {dt}"]
+                content = [f"{title} on {dt:%A %d %B}"]
 
             if metadata.abstract:
                 content.append(metadata.abstract.replace("\n", "\n"))
             if metadata.url:
                 content.append(f"arXiv: {metadata.url}")
-            fe.description("\n".join(content))
+
+            desc = "\n".join(content)
+            fe.description(desc)
+            fe.podcast.itunes_summary(desc)
+            fe.podcast.itunes_subtitle(content[0])
             fe.enclosure(url, length=str(file.stat().st_size), type="audio/mpeg")
 
     podcast_file = output_folder / rss_file
     logger.info("Writing podcast in %s", podcast_file)
-    fg.rss_str(pretty=True)
-    fg.rss_file(str(podcast_file))
+    fg.rss_file(str(podcast_file), pretty=True)
     return 0
 
 
