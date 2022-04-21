@@ -376,13 +376,13 @@ def create_rss_feed(
             continue
         date_str = out.name
         dt = datetime.strptime(date_str, DATE_FMT).astimezone(eastern_US_tz)
+        if dt < max_time_dt:
+            continue
         logger.info("Creating feed for date %s", date_str)
         for file in sorted(out.glob("*.mp3")):
             title = unquote(" ".join(file.name.replace("_", " ").split(".")[1:-1]))
             metadata = get_metadata(file)
-            if dt < max_time_dt:
-                continue
-            elif metadata.category and metadata.category not in categories:
+            if metadata.category and metadata.category not in categories:
                 continue
             url = f"{config.base_url}/{date_str}/{quote(file.name)}"
             logger.info("Found mp3 file %s", file)
