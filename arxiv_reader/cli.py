@@ -29,12 +29,12 @@ from arxiv_reader.latex_utils import latex2speech
 DATE_FMT = "%d-%m-%Y"
 ARXIV_QUERY = "(%(categories)s) AND lastUpdatedDate:[%(start)s TO %(end)s]"
 ASTRO_CATEGORIES = (
-    "cat:astro-ph.GA",
-    "cat:astro-ph.CO",
-    "cat:astro-ph.EP",
-    "cat:astro-ph.HE",
-    "cat:astro-ph.IM",
-    "cat:astro-ph.SR",
+    "astro-ph.GA",
+    "astro-ph.CO",
+    "astro-ph.EP",
+    "astro-ph.HE",
+    "astro-ph.IM",
+    "astro-ph.SR",
 )
 
 logger = logging.getLogger(__name__)
@@ -287,7 +287,9 @@ def pull(*, base_date: Optional[str], output: str, **kwargs) -> int:
         f"to {end_date:%d %m %Y 13:59 Eastern time}"
     )
     q = ARXIV_QUERY % dict(
-        categories=" OR ".join(ASTRO_CATEGORIES), start=start, end=end
+        categories=" OR ".join(f"cat:{cat}" for cat in ASTRO_CATEGORIES),
+        start=start,
+        end=end,
     )
     search = arxiv.Search(
         query=q,
@@ -367,7 +369,9 @@ def create_rss_feed(
 
     max_time_dt = datetime.now(tz=local_tz) - timedelta(max_time)
 
-    for out in sorted(output_folder.glob("*")):
+    for out in sorted(
+        output_folder.glob("*"), key=lambda o: o.name.split("-")[::-1], reverse=True
+    ):
         if out.is_file():
             continue
         date_str = out.name
