@@ -284,10 +284,13 @@ def pull(*, base_date: Optional[str], output: str, **kwargs) -> int:
     start = start_date.strftime("%Y%m%d1400")
     end = end_date.strftime("%Y%m%d1359")
 
-    logger.info(
+    info_str = (
         f"Querying ADS from {start_date:%d %m %Y 14:00 Eastern time} "
         f"to {end_date:%d %m %Y 13:59 Eastern time}"
     )
+
+    logger.info(info_str)
+
     q = ARXIV_QUERY % dict(
         categories=" OR ".join(f"cat:{cat}" for cat in ASTRO_CATEGORIES),
         start=start,
