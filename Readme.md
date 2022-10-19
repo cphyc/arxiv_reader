@@ -4,6 +4,10 @@ Some people like to kickstart their day as a researcher by reading the papers ap
 Some wish they could _listen_ to these abstracts while commuting or on their way to work.
 This projects aims at doing exactly this.
 
+## Listening to it as a podcast
+
+You can listen to the arxiv reader by following one of the podcast flux found [here](https://pub.cphyc.me/Science/arxiv/). Alternatively, you can find it on [Google Podcasts](https://podcasts.google.com/search/Astro%20arXiv), [Spotify](https://open.spotify.com/show/6wBd1EZzY1sQhBscwGtd0l) or your favourite podcast app.
+
 ## How does it work?
 
 This script is actually simple and simply brings together different already-existing tools.
