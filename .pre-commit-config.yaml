@@ -10,7 +10,7 @@ repos:
     - id: trailing-whitespace
     - id: end-of-file-fixer
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v3.6.0
+    rev: v3.7.0
     hooks:
     - id: pyupgrade
       args: [--py36-plus]
@@ -33,7 +33,7 @@ repos:
         flake8-logging-format>=0.7.4
       ]
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.3.0
+    rev: v1.4.1
     hooks:
     - id: mypy
       additional_dependencies: [types-dateparser, types-toml, types-python-dateutil, types-requests]
